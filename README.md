@@ -60,6 +60,7 @@ behaviour should be in this way?
 configuration. Returns presetsCollection function. 
   - **presetsCollection(...presets)** - Takes presets collection (strings or functions). Returns collectionMerge function.
   - **collectionMerge(merger, initialValue = {})** -  Takes merger function (required, details below) and initial value (optional).
+Returns merged result. 
 
 ### Presets
 
@@ -166,6 +167,11 @@ const merge = (collectionConfig, presetConfig) => ({
 According to merge requirements - could be more complex. 
 There is list of merge functions and it's description and the end of documentation.
     
+    
+## Install
+
+`npm install --save presets`
+
 ## Abstract example
 
 ```js
@@ -189,10 +195,132 @@ const config = mergeCollection(merge, initialConfig);
 
 ## Real example
 
-## Install
+Webpack:
+```js
+import presets from 'presets';
+import webpackMerge from 'webpack-merge';
+import webpackIndexTemplates from 'webpack-index-templates';
 
-`npm install --save presets`
+const presetsCollection = presets();
 
+const mergeCollection = presetsCollection(
+  'webpack-production', 
+  'webpack-dev',
+  'webpack-react-toolbox',
+  'webpack-build-logs',
+  'webpack-hot-reload',
+  webpackIndexTemplates({
+    src: './index.html',
+    dest: 'index.html',
+    variables: {
+      // ...
+    }
+  }),
+  
+  webpackIndexTemplates({
+    src: './index.html',
+    dest: 'index-staging.html',
+    variables: {
+      // ...
+    }
+  }),
+);
+
+const initialWebpackConfig = {
+  entry: {
+    app: [
+      'babel-polyfill',
+      './scripts/master'
+    ]
+  },
+};
+
+const webpackConfig = mergeCollection(webpackMerge, initialWebpackConfig);
+```
+
+Karma:
+```js
+import presets from 'presets';
+import karmaMerge from 'karma-merge';
+
+const presetsCollection = presets();
+
+const mergeCollection = presetsCollection(
+  'karma-webpack',
+  'karma-coverage',
+  'karma-chrome',
+  'karma-mocha',
+  'karma-phantomjs',
+  'karma-gremlins'
+);
+
+const initialKarmaConfig = {
+  files: [
+    'src/**/*/__tests__/*.js'
+  ]
+};
+
+const karmaConfig = mergeCollection(karmaMerge, initialKarmaConfig);
+```
+
+APi configuration:
+```js
+import presets from 'presets';
+import functionalMerge from 'presets/functional-merge';
+
+const presetsCollection = presets();
+
+const mergeCollection = presetsCollection(
+  'fetch',
+  'cross-browser',
+  'cache-request'
+);
+
+
+const api = mergeCollection(functionalMerge);
+
+api('POST /users/1', {
+  // ... request
+});
+```
+
+React component configuration:
+```js
+import presets from 'presets';
+import merge from 'presets/merge';
+
+import aclPresets form 'acl-presets';
+
+const presetsCollection = presets();
+
+const mergeCollection = presetsCollection(
+  props => <Button ...props/>,
+  aclPresets({
+    admin: () => { //... },
+    guest: () => { //... }
+  }),
+);
+
+
+const AclButton = mergeCollection(merge);
+```
+
+Express configurations
+```js
+import presets from 'presets';
+import merge from 'presets/merge';
+
+const presetsCollection = presets();
+
+const mergeCollection = presetsCollection(
+  'express-auth',
+  'express-secure-routing',
+  'express-spa'
+);
+
+
+const server = mergeCollection(merge);
+```
 
 ## Contribute
 
