@@ -12,64 +12,62 @@ And that configuration code will be copied from project to project.
 For example - we have a lot of projects with webpack and karma. That configs are almost the same. 
 Webpack common sections:
   
-    - Plugins for production (optimization)
-    - Plugins for development (devtool, define etc.)
-    - resolve attr.
-    - context attr.
-    - resolveLoader fallback
+  - Plugins for production (optimization)
+  - Plugins for development (devtool, define etc.)
+  - resolve attr.
+  - context attr.
+  - resolveLoader fallback
 
 Webpack different sections:
 
-    - entry
-    - externals
-    - loaders 
+  - entry
+  - externals
+  - loaders 
 
-We could move common code to separated repository and it always will be up to date for all projects (even possible to 
-bind to specific version). But this is not common solution: For karma config - we should do the same. Or we want to
-use webpack production configuration from github boilerplate repository, where community always suggest best ways and
+Sure we could move common code to separated repository and it always will be up to date for all projects (even possible to 
+bind to specific version). But this is not good solution: For karma config - we should do the same. Or we want to
+use webpack production configuration from boilerplate repository at github, where community always suggest best ways and
 practices.
 
 This also could be applicable to:
  
-    - api configuration
-    - components configuration
-    - cli tasks configuration
-    - environment configuration
-    - routing configuration
-    - middleware configuration (express / redux etc.)
-    - 
+  - api configuration
+  - components configuration
+  - cli tasks configuration
+  - environment configuration
+  - routing configuration
+  - middleware configuration (express / redux etc.)
+  - generating higher-ordered functions
     
 ## Сoncepts
 
 **preset** - simple function with return statement. Could be configured with higher-order function. Returned value is depends
 on preset's context.
 
-**merger** - function that is responsible for presets collection results merging. Responsible for the way how presets 
-should be merged: 
+**merger** - function that merge presets. Responsible for the way how presets should be merged: 
 
-    - should preset's results be merged at the root level?
-    - should preset's results be merged at all nested levels?
-    - should some attributes be merged or overridden?
-    - should some attributes be merged or overridden if already exists?
-    - if preset's result is function - each next preset should be the higher-order function. What function's arguments 
-    behaviour should be in this way? 
- 
+  - should preset's results be merged at the root level?
+  - should preset's results be merged at all nested levels?
+  - should some attributes be merged or overridden?
+  - should some attributes be merged or overridden if already exists?
+  - if preset's result is function - each next preset should be the higher-order function. What function's arguments 
+behaviour should be in this way? 
+
     
 ## API
 
-- **presets(props = {})** - Takes props (optional) that will be passed to each preset's function. Could be used for
+  - **presets(props = {})** - Takes props (optional) that will be passed to each preset's function. Could be used for
 configuration. Returns presetsCollection function. 
-- **presetsCollection(...presets)** - Takes presets collection (strings or functions). Returns collectionMerge function.
-- **collectionMerge(merger, initialValue = {})** -  Takes merger function (required, details below) and initial value (optional).
+  - **presetsCollection(...presets)** - Takes presets collection (strings or functions). Returns collectionMerge function.
+  - **collectionMerge(merger, initialValue = {})** -  Takes merger function (required, details below) and initial value (optional).
 
 ### Presets
 
 ```js
 import presets from 'presets';
 ```
-**presets(props)** - returns function for configuring presets collection. 
-
- - props - optional argument and if exists - props will be passed as first arguments for each preset in collection.
+**presets(props)** - returns function for configuring presets collection. props - optional argument and if exists -
+it will be passed as first arguments for each preset in collection.
 
 ### Presets collection
 
@@ -86,11 +84,11 @@ In this way - preset's module export - should be a function. Next steps are same
 
 ```js
 import presets from 'presets';
-const pipe = presets({
+const presetsCollection = presets({
   // ...
 });
 
-const collection = pipe({
+const mergeCollection = presetsCollection({
   'webpack-production', // will search for "preset-webpack-production" in node_modules
   'webpack-hot-reload'  // will search for "preset-webpack-hot-reload" in node_modules
 });
@@ -100,11 +98,11 @@ Is preset is function - it will be executed and it's result will be merged with 
     
 ```js
 import presets from 'presets';
-const pipe = presets({
+const presetsCollection = presets({
   // ...
 });
 
-const collection = pipe({
+const mergeCollection = presetsCollection({
   (props) => {
     return {
       // ...
@@ -117,11 +115,11 @@ And combined:
 
 ```js
 import presets from 'presets';
-const pipe = presets({
+const presetsCollection = presets({
   // ...
 });
 
-const collection = pipe({
+const mergeCollection = presetsCollection({
   'webpack-production', // will search for "preset-webpack-production" in node_modules
   'webpack-hot-reload'  // will search for "preset-webpack-hot-reload" in node_modules
    (props) => {
@@ -144,7 +142,7 @@ const presetsCollection = presets({
   // ...
 });
 
-const collectionMerge = presetsCollection({
+const mergeCollection = presetsCollection({
   // ...
 });
 
@@ -152,7 +150,7 @@ const initialValue = {
   // ...
 };
 
-const config = collectionMerge(merge, initialValue);
+const config = mergeCollection(merge, initialValue);
 ```
 
 **merge** - simple function that merge preset's results. 
@@ -174,19 +172,19 @@ There is list of merge functions and it's description and the end of documentati
 import presets from 'presets';
 import merge from 'presets/merge';
 
-const pipe = presets({
+const presetsCollection = presets({
   // ...
 });
 
 // will search for 'presets-foo', 'presets-bar', 'presets-baz' in node_modules
-const collection = pipe('foo', 'bar', 'baz');
+const mergeCollection = presetsCollection('foo', 'bar', 'baz');
 
 
 const initialConfig = {
   // ....
 };
 
-const config = collection(merge, initialConfig);
+const config = mergeCollection(merge, initialConfig);
 ```
 
 ## Real example

@@ -2,10 +2,8 @@ import magicRequire from 'magic-require';
 import isString from 'lodash/isString';
 import isFunction from 'lodash/isFunction';
 
-export default 10;
-
-export default (props) => {
-  return function(...presets) {
+export default function presets(props) {
+  return function presetsCollection(...presets) {
     const normalized = presets.map(preset => {
       if (isString(preset)) {
         const presetModule = `preset-${preset}`;
@@ -17,7 +15,7 @@ export default (props) => {
       }
     });
 
-    return function(merge, initConfig = {}) {
+    return function mergeCollection(merge, initConfig = {}) {
       return normalized.reduce((config, preset) => {
         return merge(preset(props), config);
       }, initConfig);

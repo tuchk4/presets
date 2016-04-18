@@ -12,25 +12,26 @@ describe('Presets', () => {
     expect(isFunction(presets)).toEqual(true);
   });
 
-  it('should return pipe function', () => {
+  it('should return presetsCollection function', () => {
     expect(isFunction(presets())).toEqual(true);
   });
 });
 
-describe('Presets pipe', () => {
-  it('should accept correct arguments', () => {
-    const pipe = presets();
-    expect(() => pipe([])).toThrow();
+
+describe('presetsCollection', () => {
+  it('should return mergeCollection function', () => {
+    const presetsCollection = presets();
+    expect(isFunction(presetsCollection())).toEqual(true);
   });
 
-  it('should return merge function', () => {
-    const pipe = presets();
-    expect(isFunction(pipe())).toEqual(true);
+  it('should accept correct arguments', () => {
+    const presetsCollection = presets();
+    expect(() => presetsCollection([])).toThrow();
   });
 });
 
-describe('Presets merge', () => {
-  const pipeInput = {
+describe('mergeCollection', () => {
+  const props = {
     input: 'Hello world!'
   };
 
@@ -42,11 +43,11 @@ describe('Presets merge', () => {
   let presetMock2 = null;
   let presetMock3 = null;
 
-  let merger = null;
+  let mergeCollection  = null;
 
   beforeEach(() => {
-    const pipe = presets({
-      ...pipeInput
+    const presetsCollection = presets({
+      ...props
     });
 
     presetMock1 = jest.genMockFunction();
@@ -57,7 +58,7 @@ describe('Presets merge', () => {
       return presetMock3.bind(null, props);
     });
 
-    merger = pipe(
+    mergeCollection = presetsCollection(
       presetMock1,
       presetMock2,
       presetMock4({
@@ -67,30 +68,30 @@ describe('Presets merge', () => {
   });
 
   it('should execute pipe and pass arguments from presets', () => {
-    merger(merge);
+    mergeCollection(merge);
 
     expect(presetMock1).toBeCalledWith({
-      ...pipeInput
+      ...props
     });
 
     expect(presetMock2).toBeCalledWith({
-      ...pipeInput
+      ...props
     });
 
-    expect(presetMock3).toBeCalledWith({...presetInput}, {...pipeInput});
+    expect(presetMock3).toBeCalledWith({...presetInput}, {...props});
   });
 });
 
 
 describe('Merge result', () => {
   it('should be correct according to root level', () => {
-    const pipe = presets({
+    const presetsCollection = presets({
       a: 1,
       b: 2,
       c: 3
     });
 
-    const merger = pipe(
+    const mergeCollection = presetsCollection(
       props => ({
         foo: 1,
         a: props.a
@@ -105,7 +106,7 @@ describe('Merge result', () => {
       })
     );
 
-    expect(merger(merge)).toEqual({
+    expect(mergeCollection(merge)).toEqual({
       a: 1,
       b: 2,
       c: 3,
@@ -114,11 +115,11 @@ describe('Merge result', () => {
   });
 
   it('should be correct with initial value', () => {
-    const pipe = presets({
+    const presetsCollection = presets({
       a: 1
     });
 
-    const merger = pipe(
+    const mergeCollection = presetsCollection(
       props => ({
         foo: 1,
         a: props.a
@@ -129,7 +130,7 @@ describe('Merge result', () => {
       bar: 2
     };
 
-    expect(merger(merge, initialValue)).toEqual({
+    expect(mergeCollection(merge, initialValue)).toEqual({
       a: 1,
       foo: 1,
       bar: 2
@@ -137,9 +138,9 @@ describe('Merge result', () => {
   });
 
   it('should be correct with custom merger', () => {
-    const pipe = presets();
+    const presetsCollection = presets();
 
-    const merger = pipe(
+    const mergeCollection = presetsCollection(
       props => ({
         a: 1
       }),
@@ -158,7 +159,7 @@ describe('Merge result', () => {
     // use only last preset
     const customMerge = (a, b) => a;
 
-    expect(merger(customMerge, initialValue)).toEqual({
+    expect(mergeCollection(customMerge, initialValue)).toEqual({
       c: 1
     });
   });
