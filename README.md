@@ -1,4 +1,6 @@
 # Presets
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/tuchk4/presets.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/tuchk4/presets.svg?branch=master)](https://travis-ci.org/tuchk4/presets)
 
 Presets collection merger. 
